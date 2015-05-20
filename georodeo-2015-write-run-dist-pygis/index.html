@@ -1,0 +1,137 @@
+<!doctype html>
+<html lang="en">
+
+    <head>
+        <meta charset="utf-8">
+
+        <title>Fiona and Rasterio</title>
+
+        <meta name="apple-mobile-web-app-capable" content="yes" />
+        <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+        <link rel="stylesheet" href="../css/reveal.css">
+        <link rel="stylesheet" href="../css/theme/default.css" id="theme">
+
+        <!-- For syntax highlighting -->
+        <link rel="stylesheet" href="../lib/css/zenburn.css">
+
+        <!-- If the query includes 'print-pdf', include the PDF print sheet -->
+        <script>
+            if( window.location.search.match( /print-pdf/gi ) ) {
+                var link = document.createElement( 'link' );
+                link.rel = 'stylesheet';
+                link.type = 'text/css';
+                link.href = 'css/print/pdf.css';
+                document.getElementsByTagName( 'head' )[0].appendChild( link );
+            }
+        </script>
+
+        <!--[if lt IE 9]>
+        <script src="lib/js/html5shiv.js"></script>
+        <![endif]-->
+    </head>
+
+    <body>
+
+    <div class="reveal">
+
+    <div class="slides">
+
+    <section
+      data-background="../img/rgba30.png" 
+      data-background-size="1000px">
+
+        <h1>Writing, Running, and Distributing</h1>
+        <h2>Modern Python GIS Software</h2>
+        <p>Sean Gillies @Mapbox</p>
+        <p><small>GeoRodeo 2015 &#8729; Austin &#8729; May 22</small></p>
+
+    <aside class="notes">
+    Hi! Good morning! Thank you very much for coming to this sessiom. My name
+    is Sean Gillies, I work at Mapbox.  I've been a Python programmer since
+    2001 and a GIS analyst and programmer since 1999, with a séjour in the
+    digital classics from 2006 to 2013.  This is my first GeoRodeo.
+    </aside>
+
+    </section>
+
+    <section>
+    <!-- What I'm going to tell you -->
+    <h2>The Three R's</h2>
+    <ul>
+        <li>How to w<b style="color:yellow">rite</b> good Python programs</li>
+        <li>How to w<b style="color:yellow">rangle</b> and distribute them</li>
+        <li>How to deploy and <b style="color:yellow">run</b> them</li>
+    </ul>
+
+    <aside class="notes">
+    </aside>
+    </section>
+
+    <section>
+    <h2>Thanks</h2>
+    <ul>
+      <li>Mapbox satellite team (Chris, Charlie, Amit, Bruno, Camilla)</li>
+      <li>Asger Petersen, Mike Toews, Brendan Ward, Kelsey Jordahl, René Buffat, Jacob Wasserman, Oliver Tonnhofer, Joshua Arnott, Phil Elson, Matt Perry</li>
+      <li>And especially Frank Warmerdam and Even Rouault</li>
+    </ul>
+    </section>
+
+    <section>
+    <h2>Links</h2>
+    <ul>
+      <li><a href="https://github.com/sgillies/foss4g-2014-fiona-rasterio">https://github.com/sgillies/foss4g-2014-fiona-rasterio</a></li>
+      <li><a href="https://github.com/Toblerity/Fiona">https://github.com/Toblerity/Fiona</a></li>
+      <li><a href="https://github.com/mapbox/rasterio">https://github.com/mapbox/rasterio</a></li>
+      <li><a href="https://github.com/Toblerity/Shapely">https://github.com/Toblerity/Shapely</a></li>
+    </ul>
+    </section>
+
+    <section>
+        <h2>THE END</h2>
+    </section>
+
+    <!-- end slides -->
+    </div>
+
+    <!-- end reveal container -->
+    </div>
+
+    <!-- Scripts below -->
+
+        <script src="../lib/js/head.min.js"></script>
+        <script src="../js/reveal.min.js"></script>
+
+        <script>
+
+            // Full list of configuration options available here:
+            // https://github.com/hakimel/reveal.js#configuration
+            Reveal.initialize({
+                controls: true,
+                progress: true,
+                history: true,
+                center: true,
+
+                theme: Reveal.getQueryHash().theme, // available themes are in /css/theme
+                transition: Reveal.getQueryHash().transition || 'default', // default/cube/page/concave/zoom/linear/fade/none
+
+                // Parallax scrolling
+                // parallaxBackgroundImage: 'https://s3.amazonaws.com/hakim-static/reveal-js/reveal-parallax-1.jpg',
+                // parallaxBackgroundSize: '2100px 900px',
+
+                // Optional libraries used to extend on reveal.js
+                dependencies: [
+                    { src: '../lib/js/classList.js', condition: function() { return !document.body.classList; } },
+                    { src: '../plugin/markdown/marked.js', condition: function() { return !!document.querySelector( '[data-markdown]' ); } },
+                    { src: '../plugin/markdown/markdown.js', condition: function() { return !!document.querySelector( '[data-markdown]' ); } },
+                    { src: '../plugin/highlight/highlight.js', async: true, callback: function() { hljs.initHighlightingOnLoad(); } },
+                    { src: '../plugin/zoom-js/zoom.js', async: true, condition: function() { return !!document.body.classList; } },
+                    { src: '../plugin/notes/notes.js', async: true, condition: function() { return !!document.body.classList; } }
+                ]
+            });
+
+        </script>
+
+    </body>
+</html>

@@ -1,0 +1,598 @@
+<!doctype html>
+<html lang="en">
+
+    <head>
+        <meta charset="utf-8">
+
+        <title>Fiona and Rasterio</title>
+
+        <meta name="apple-mobile-web-app-capable" content="yes" />
+        <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+        <link rel="stylesheet" href="../css/reveal.css">
+        <link rel="stylesheet" href="../css/theme/default.css" id="theme">
+
+        <!-- For syntax highlighting -->
+        <link rel="stylesheet" href="../lib/css/zenburn.css">
+
+        <!-- If the query includes 'print-pdf', include the PDF print sheet -->
+        <script>
+            if( window.location.search.match( /print-pdf/gi ) ) {
+                var link = document.createElement( 'link' );
+                link.rel = 'stylesheet';
+                link.type = 'text/css';
+                link.href = 'css/print/pdf.css';
+                document.getElementsByTagName( 'head' )[0].appendChild( link );
+            }
+        </script>
+
+        <!--[if lt IE 9]>
+        <script src="lib/js/html5shiv.js"></script>
+        <![endif]-->
+    </head>
+
+    <body>
+
+    <div class="reveal">
+
+    <div class="slides">
+
+    <section
+      data-background="../img/rgba30.png" 
+      data-background-size="1000px">
+
+        <h1>Fiona and Rasterio</h1>
+        <h2>Data Access for Python Programmers and Future Python Programmers</h2>
+        <p>Sean Gillies @Mapbox</p>
+        <p><small>FOSS4G 2014 &#8729; Portland &#8729; September 10</small></p>
+
+    <aside class="notes">
+    Hi! Good morning! Thank you very much for coming to this sessiom. My name
+    is Sean Gillies, I work at Mapbox. 
+    I've been a Python programmer since 2001 and a GIS analyst and programmer
+    since 1999, with a séjour in the digital classics from 2006 to 2013.
+    I've been coming to FOSS4G off and on since it was the MapServer User
+    Meeting.
+    </aside>
+
+    </section>
+
+    <section>
+    <!-- What I'm going to tell you -->
+    <h2>New Python packages</h2>
+    <ul>
+      <li>Fiona and Rasterio are Python interfaces to OGR and GDAL</li>
+      <li>Each are native GeoJSON speakers</li>
+      <li>Each embrace the good parts of Python</li>
+      <li>Each embrace the command line</li>
+    </ul>
+
+    <aside class="notes">
+    My talk is about new Python geospatial software and a double challenge in developing it.
+    
+    Why are we writing new geodata access libraries?
+
+    How do you use it yourselves?
+    </aside>
+    </section>
+
+
+    <section>
+    <!-- What I'm going to tell you -->
+    <h2>A Double Challenge</h2>
+    <ul>
+      <li class="fragment">Helping experienced Python programmers learn GIS concepts</li>
+      <li class="fragment">Helping GIS experts learn to be better Python programmers</li>
+    </ul>
+
+    <aside class="notes">
+    My talk is about new Python geospatial software and a double challenge in developing it.
+    
+    Why are we writing new geodata access libraries?
+
+    How do you use it yourselves?
+    </aside>
+    </section>
+
+    <!-- Cloudless Gibralter -->
+    <section
+      data-background="../img/8871945777_603bfd7d9f_b.jpg"
+      data-background-size="1024px">
+    <h2>Mapbox Cloudless</h2>
+
+    <aside class="notes">
+    The Mapbox Satellite Team is making a Cloudless Landsat mosaic of the
+    world.
+
+    This is a base layer for maps created by Mapbox users. Its primary
+    requirements are to be current and to look good. We'll be working
+    on products that are better for science in the future.
+
+    This is the project that drives a lot of Rasterio development.
+
+    It has interesting technical problems.
+    </aside>
+    </section>
+
+
+    <section>
+    <h2>We have interesting problems</h2>
+    <ul>
+      <li>Off-the-shelf solutions are scarce</li>
+      <li>Trial and error is involved</li>
+      <li class="fragment">We need new software</li>
+    </ul>
+
+    <aside class="notes">
+    Trial and error isn't our only method, but it's an important one. It
+    has a big impact on our requirements.
+    </aside>
+    </section>
+
+    <section>
+    <h2>Software requirements</h2>
+    <ol>
+      <li class="fragment">Allow rapid prototyping and iteration</li>
+      <li class="fragment">Use dependable algorithms</li>
+      <li class="fragment">Scale out to many computers</li>
+    </ol>
+
+    <aside class="notes">
+    We need to get new iterations of our algorithms into production
+    quickly. We need robust numerical libraries. And we need to distribute
+    the work across many servers. And also know the cost of doing it.
+    </section>
+
+    <section>
+    <h2>Fulfilling requirements</h2>
+    <ul>
+      <li>1 and 3 argue for open source</li>
+      <li>1 argues for a high-level language with handy multi-dimensional array syntax</li>
+      <li>2 argues for LAPACK (&c) and GDAL</li>
+      <li class="fragment">The fit: Linux, Python, Numpy, Scipy</li>
+    </ul>
+    </section>
+
+    <!-- Geospatial -->
+    <section>
+    <h2>GDAL Python bindings?</h2>
+    <ul>
+      <li>They've served us long and well</li>
+      <li>But they don't fit well with the good parts of Python</li>
+      <li class="fragment">We can do better</li>
+    </ul>
+
+    <aside class="notes">
+    We can do better while keeping the power of the GDAL and OGR libraries.
+    </aside>
+    </section>
+
+    <section>
+    <h3>The good parts</h3>
+    <img src="../img/py-js-c.png" style="border:none">
+
+    <aside class="notes">
+    What do I mean by the good parts of Python?
+
+    I've made a Venn diagram of unique good features of three common languages.
+    The "good parts" of each. It's not exhaustive, I'm leaving out some good
+    parts.
+    We can argue over whether I got these exactly right and I hope we will.
+    
+    The image is derived from http://commons.wikimedia.org/wiki/File:Venn_diagram_cmyk.svg.
+
+    Anybody recognize the yellow language? I'll give you a hint: the other
+    two are implemented in it. Right: C/C++.
+
+    Anybody recognize the magenta language? Right, javascript.
+
+    Anybody recognize the blue language? Right, Python.
+
+    The good parts of Python are lacking in Javascript and C. Wrapper
+    generators like SWIG give you the features in the overlap between Python
+    and C, but have a hard time with the good parts of the dynamic language.
+    
+    Bottom line is that GDAL's Python bindings aren't a good match for the 
+    good parts of Python.
+
+    I'm thinking about the design of D3 and Mike Bostock's explanation of
+    what its user gain by D3's embrace of the DOM and browser standards.
+
+    I'm convinced that spatial programmers can similarly benefit from software that embraces Python.
+    </aside>
+    </section>
+
+    <section>
+    <h2>OGR Example</h2>
+    <pre><code data-trim>
+from osgeo import ogr
+
+# Create ring
+ring = ogr.Geometry(ogr.wkbLinearRing)
+ring.AddPoint(1179091.1646903288, 712782.8838459781)
+ring.AddPoint(1161053.0218226474, 667456.2684348812)
+ring.AddPoint(1214704.933941905, 641092.8288590391)
+ring.AddPoint(1228580.428455506, 682719.3123998424)
+ring.AddPoint(1218405.0658121984, 721108.1805541387)
+ring.AddPoint(1179091.1646903288, 712782.8838459781)
+
+# Create polygon
+poly = ogr.Geometry(ogr.wkbPolygon)
+poly.AddGeometry(ring)</code></pre>
+
+<small>[source: http://pcjericks.github.io/py-gdalogr-cookbook/]</small>
+
+<aside class="notes">
+This is the classic way to create an osgeo.ogr geometry object.
+
+It could be tightened up a bit.
+</aside>
+
+  </section>
+
+    <section>
+    <h2>Analogy</h2>
+    <pre><code data-trim>
+# C style
+nums = []
+for i in range(100):
+    nums.append(i)
+    </code></pre>
+
+    vs
+
+    <pre><code data-trim>
+# Python style
+nums = list(range(100))
+    </code></pre>
+
+<aside class="notes">
+I've got an analogy to Python list construction.
+
+First, I'm showing the most imperative, C-like way of making a Python list of the first 100 numbers.
+
+Next, the most idiomaticly Python way of doing it.
+</aside>
+
+    </section>
+
+    <section>
+    <h2>Not just less code – faster</h2>
+    <pre><code class="bash" data-trim>
+$ python -m timeit -s "nums=[]" "for i in xrange(1000):" "  nums.append(i)"
+10000 loops, best of 3: 76.4 usec per loop
+</code></pre>
+
+vs
+
+<pre><code class="bash" data-trim>
+$ python -m timeit -s "nums=list(xrange(1000))"
+100000000 loops, best of 3: 0.0108 usec per loop
+</code></pre>
+
+<aside class="notes">
+The idomaticly Python way is faster. ridiculously faster!
+
+Do this in your code.
+
+Provide APIs like this in your Python packages.
+</aside>
+    </section>
+
+    <section>
+    <h2>Literal syntax: {} for geometries</h2>
+    <pre><code class="python" data-trim>
+# Create polygon
+poly = {
+    'type': 'Polygon',
+    'coordinates': [[
+        (1179091.1646903288, 712782.8838459781),
+        (1161053.0218226474, 667456.2684348812),
+        (1214704.933941905, 641092.8288590391),
+        (1228580.428455506, 682719.3123998424),
+        (1218405.0658121984, 721108.1805541387),
+        (1179091.1646903288, 712782.8838459781) ]]}
+    </code></pre>
+    30X faster than OGR with AddPoint()
+    </section>
+
+    <section>
+    <h2>Pay only for what you eat</h2>
+    <pre><code class="python" data-trim>
+# This is "dumb" data, no methods.
+data = {
+    'type': 'Polygon',
+    'coordinates': [[
+        (1179091.1646903288, 712782.8838459781),
+        ...
+        (1179091.1646903288, 712782.8838459781) ]]}
+
+# When you need spatial methods, bring in Shapely.
+from shapely.geometry import shape
+print shape(data).buffer(100.0).area
+    </code></pre>
+
+    </section>
+
+    <section>
+    <h2>Winning the Double Challenge</h2>
+    <ul>
+    <li class="fragment">Python programmers get GIS data access via familiar Python idioms (dicts, iterators, &c.)</li>
+    <li class="fragment">Future Python programmers learn to do things in the fast and effective Python way</li>
+    </section>
+
+    <section>
+    <h2>Design of Fiona and Rasterio</h2>
+    <ul>
+      <li>A Python package at the top</li>
+      <li>Extension modules (using Cython) in the middle</li>
+      <li>Fast loops, typed memoryviews, "nogil" blocks</li>
+      <li>GDAL shared library on the bottom</li>
+    </ul>
+
+    <aside class="notes">
+    Cython takes care of a lot of C extension details for us.
+
+    Rasterio uses Cython features like fast loops, typed memoryviews, 
+    and "nogil" blocks.
+    </section>
+
+    <section>
+    <h2>Reading raster data</h2>
+    <pre><code class="python" data-trim>
+import rasterio
+
+with rasterio.open(path) as src:
+    data = src.read()
+    </code></pre>
+
+    <ul><li><code>open()</code> gives you a file-like dataset object</li>
+    <li><code>read()</code> gives you a Numpy ndarray</li>
+    <li>Read windows of data with extended slice-like syntax</li></ul>
+
+    <aside class="notes">
+    Rasterio is geared for band-interleaved data.
+
+    New read() method coming in 0.9.
+    </aside>
+    </section>
+
+    <section>
+    <h2>Reading vector data</h2>
+    <pre><code class="python" data-trim>
+import fiona
+
+with fiona.open(path) as src:
+    first = next(src)
+    </code></pre>
+
+    <ul><li><code>open()</code> gives you a file-like iterator</li>
+    <li><code>next()</code> gives you the next feature record from the iterator</li>
+    <li>Records are Python dicts</li></ul>
+    </section>
+
+    <section>
+    <h2>Writing raster data</h2>
+    <pre><code class="python" data-trim>
+kwargs = src.meta
+
+with rasterio.open(path, 'w', **kwargs) as dst:
+    dst.write(arr)
+    </code></pre>
+
+    <ul><li>Get keyword args needed to open a dataset for writing from another dataset</li>
+    <li><code>write()</code> takes an ndarray</li>
+    <li>You can also write to windows of a dataset</li></ul>
+
+    </section>
+
+    <section>
+    <h2>Writing vector data</h2>
+    <pre><code class="python" data-trim>
+kwargs = src.meta
+
+with fiona.open(path, 'w', **kwargs) as dst:
+    dst.write(record)
+    </code></pre>
+
+    <ul><li>Get keyword args needed to open a dataset for writing from another dataset</li>
+    <li><code>write()</code> takes a feature record dict</li>
+
+    </section>
+
+    <section>
+    <h2>Georeferencing</h2>
+    Fiona and Rasterio follow the lead of pyproj
+    <pre><code class="python" data-trim>
+>>> import rasterio
+>>> src = rasterio.open('tests/data/RGB.byte.tif')
+>>> src.crs
+{'units': 'm', 'zone': 18, 'ellps': 'WGS84', 'proj': 'utm', 'no_defs': True}
+    </code></pre>
+    PROJ.4 items as a dict.
+    </section>
+
+    <section>
+    <h2>rasterio.features module</h2>
+    <ul><li><code>rasterio.features.shapes()</code> yields all the features of an array as GeoJSON-like objects</li>
+    <li><code>rasterio.features.rasterize()</code> "burns" GeoJSON-like objects into an array</li>
+    <li>Dicts, iterators, tuples, ndarrays</li>
+    <li>No datasets or layers necessary</li></ul>
+    </section>
+
+    <section>
+    <img src="../img/py-powered.png">
+    <pre><code data-trim>
+{'coordinates': [[(71.0, 6.0), ...]], 'type': 'Polygon'}, ...
+    </code></pre>
+    <img src="img/py-powered-rev.png">
+    </section>
+
+    <section>
+    <h2>rasterio.warp module</h2>
+    <ul><li><code>rasterio.warp.reproject()</code> maps elements of one array to another, using cartographic projections</li>
+    <li>No datasets or layers required</li>
+    <li>Data created in non-GIS programs can be reprojected for use with GIS programs</li></ul>
+    </section>
+
+    <section>
+    <h2>In the Beginning...</h2>
+    <h2>Was the Command Line</h2>
+    </section>
+
+    <section>
+    <h2>Grep is cool, but</h2>
+    <pre><code class="bash" data-trim>
+$ gdalinfo tests/data/RGB.byte.tif | grep -c '^Band \d'
+3
+    </code></pre>
+    there's gotta be a better way
+    </section>
+
+    <section>
+    <h2>Command Line Fun</h2>
+    <pre><code class="bash" data-trim>
+$ rio --help
+Usage: rio [OPTIONS] COMMAND [ARGS]...
+
+  Rasterio command line interface.
+
+Options:
+  -v, --verbose  Increase verbosity.
+  -q, --quiet    Decrease verbosity.
+  --help         Show this message and exit.
+
+Commands:
+  bounds     Write bounding boxes to stdout as GeoJSON.
+  info       Print information about a data file.
+  insp       Open a data file and start an interpreter.
+  merge      Merge a stack of raster datasets.
+  shapes     Write the shapes of features.
+  transform  Transform coordinates.
+    </code></pre>
+    </section>
+
+    <section>
+    <h2>rio info</h2>
+    <pre><code class="bash" data-trim>
+$ rio info tests/data/RGB.byte.tif --indent 2 
+{
+  "count": 3,
+  "crs": "EPSG:32618",
+  "dtype": "uint8",
+  "driver": "GTiff",
+  "bounds": [
+    101985.0,
+    2611485.0,
+    339315.0,
+    2826915.0
+  ],
+  "height": 718,
+  "width": 791,
+  "nodata": 0.0
+}    </code></pre>
+    </section>
+
+    <section>
+    <h2>Single items</h2>
+    <pre><code class="bash" data-trim>
+$ rio info tests/data/RGB.byte.tif --count
+3
+$ rio info tests/data/RGB.byte.tif --crs
+EPSG:32618
+$ rio info tests/data/RGB.byte.tif --bounds
+101985.0 2611485.0 339315.0 2826915.0
+</code></pre>
+    </section>
+
+    <section>
+    <h2>rio.shapes | geojsonio</h2>
+    <pre><code class="bash" data-trim>
+$ rio shapes /tests/data/shade.tif --precision 5 \
+> | underscore extract features.112 \
+> | geojsonio
+    </code></pre>
+    Assists from underscore-cli and geojson-cli
+    </section>
+
+    <section
+      data-background="../img/shade.png"
+      data-background-size="800px">
+    </section>
+
+    <section>
+    <h2>New Releases</h2>
+    <ul>
+      <li class="fragment">Fiona 1.2</li>
+      <li class="fragment">Rasterio 0.13</li>
+      <li class="fragment">Shapely 1.4</li>
+    </ul>
+    </section>
+
+    <section>
+    <h2>Thanks</h2>
+    <ul>
+      <li>Mapbox satellite team (Chris, Charlie, Amit, Bruno, Camilla)</li>
+      <li>Asger Petersen, Mike Toews, Brendan Ward, Kelsey Jordahl, René Buffat, Jacob Wasserman, Oliver Tonnhofer, Joshua Arnott, Phil Elson, Matt Perry</li>
+      <li>And especially Frank Warmerdam and Even Rouault</li>
+    </ul>
+    </section>
+
+    <section>
+    <h2>Links</h2>
+    <ul>
+      <li><a href="https://github.com/sgillies/foss4g-2014-fiona-rasterio">https://github.com/sgillies/foss4g-2014-fiona-rasterio</a></li>
+      <li><a href="https://github.com/Toblerity/Fiona">https://github.com/Toblerity/Fiona</a></li>
+      <li><a href="https://github.com/mapbox/rasterio">https://github.com/mapbox/rasterio</a></li>
+      <li><a href="https://github.com/Toblerity/Shapely">https://github.com/Toblerity/Shapely</a></li>
+    </ul>
+    </section>
+
+    <section>
+        <h2>THE END</h2>
+    </section>
+
+    <!-- end slides -->
+    </div>
+
+    <!-- end reveal container -->
+    </div>
+
+    <!-- Scripts below -->
+
+        <script src="../lib/js/head.min.js"></script>
+        <script src="../js/reveal.min.js"></script>
+
+        <script>
+
+            // Full list of configuration options available here:
+            // https://github.com/hakimel/reveal.js#configuration
+            Reveal.initialize({
+                controls: true,
+                progress: true,
+                history: true,
+                center: true,
+
+                theme: Reveal.getQueryHash().theme, // available themes are in /css/theme
+                transition: Reveal.getQueryHash().transition || 'default', // default/cube/page/concave/zoom/linear/fade/none
+
+                // Parallax scrolling
+                // parallaxBackgroundImage: 'https://s3.amazonaws.com/hakim-static/reveal-js/reveal-parallax-1.jpg',
+                // parallaxBackgroundSize: '2100px 900px',
+
+                // Optional libraries used to extend on reveal.js
+                dependencies: [
+                    { src: '../lib/js/classList.js', condition: function() { return !document.body.classList; } },
+                    { src: '../plugin/markdown/marked.js', condition: function() { return !!document.querySelector( '[data-markdown]' ); } },
+                    { src: '../plugin/markdown/markdown.js', condition: function() { return !!document.querySelector( '[data-markdown]' ); } },
+                    { src: '../plugin/highlight/highlight.js', async: true, callback: function() { hljs.initHighlightingOnLoad(); } },
+                    { src: '../plugin/zoom-js/zoom.js', async: true, condition: function() { return !!document.body.classList; } },
+                    { src: '../plugin/notes/notes.js', async: true, condition: function() { return !!document.body.classList; } }
+                ]
+            });
+
+        </script>
+
+    </body>
+</html>
