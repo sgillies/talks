@@ -11,7 +11,7 @@
         <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 
         <link rel="stylesheet" href="../css/reveal.css">
-        <link rel="stylesheet" href="../css/theme/default.css" id="theme">
+        <link rel="stylesheet" href="../css/theme/black.css" id="theme">
 
         <!-- For syntax highlighting -->
         <link rel="stylesheet" href="../lib/css/zenburn.css">
@@ -44,7 +44,7 @@
 
         <h1>Writing, Running, and Distributing</h1>
         <h2>Modern Python GIS Software</h2>
-        <p>Sean Gillies @Mapbox</p>
+        <p>Sean Gillies &#8729; Mapbox</p>
         <p><small>GeoRodeo 2015 &#8729; Austin &#8729; May 22</small></p>
 
     <aside class="notes">
@@ -57,7 +57,9 @@
     </section>
 
     <section>
-    <!-- What I'm going to tell you -->
+    <!-- Introduction -->
+
+    <section>
     <h2>The Three R's</h2>
     <ul>
         <li>How to w<b style="color:yellow">rite</b> good Python programs</li>
@@ -66,10 +68,83 @@
     </ul>
 
     <aside class="notes">
+
+    This is what I'm going to talk about.
+
     </aside>
     </section>
 
     <section>
+    <!-- Motivation -->
+    <h2>Why Python?</h2>
+    <ul>
+        <li class="fragment">Killer open source modules: Numpy, SciPy, scikit-learn &c</li>
+        <li class="fragment">It's the favored scripting language for Enterprise GIS Product</li>
+    </ul>
+
+    <aside class="notes">
+
+    Why Python? Isn't it yesterday's language? Isn't Python slow and a waste
+    of energy? Shouldn't I be thinking more of the polar bears? It doesn't
+    even run in my browser. Why Python?
+
+    Python isn't the cool or cutting edge language where I work. Not by a long
+    shot. We use it at Mapbox because it has more features or more maturity
+    in some important domains. I expect it's the same case for you.
+
+    Python's scientific, engineering, and mathematics software ecosystem is
+    exceptional. The Numpy, Scipy, and Scikit projects are heavy lifters with
+    no mature equivalents in Node.js.
+
+    For this audience, it's also significant that Python is the primary
+    scripting language for Esri's ArcGIS and also QGIS.
+
+    </aside>
+    </section>
+
+    <!-- Introduction -->
+    </section>
+
+    <section>
+    <!-- Conclusion -->
+
+    <section>
+    <h2>That's how to use Python</h2>
+    </section>
+
+    <section>
+    <h2>Writing Python</h2>
+    <ul>
+    </ul>
+
+    <aside class="notes">
+    </aside>
+    </section>
+
+    <section>
+    <!-- What I've told you -->
+    <h2>Distributing Python</h2>
+    <ul>
+    </ul>
+
+    <aside class="notes">
+    </aside>
+    </section>
+
+    <section>
+    <!-- What I've told you -->
+    <h2>Running Python</h2>
+    <ul>
+    </ul>
+
+    <aside class="notes">
+    </aside>
+    </section>
+
+    </section>
+
+    <section>
+
     <h2>Thanks</h2>
     <ul>
       <li>Mapbox satellite team (Chris, Charlie, Amit, Bruno, Camilla)</li>
@@ -101,7 +176,7 @@
     <!-- Scripts below -->
 
         <script src="../lib/js/head.min.js"></script>
-        <script src="../js/reveal.min.js"></script>
+        <script src="../js/reveal.js"></script>
 
         <script>
 
@@ -113,7 +188,7 @@
                 history: true,
                 center: true,
 
-                theme: Reveal.getQueryHash().theme, // available themes are in /css/theme
+                theme: Reveal.getQueryHash().theme || 'night', // available themes are in /css/theme
                 transition: Reveal.getQueryHash().transition || 'default', // default/cube/page/concave/zoom/linear/fade/none
 
                 // Parallax scrolling
