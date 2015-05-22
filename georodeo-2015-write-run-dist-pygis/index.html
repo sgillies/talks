@@ -35,81 +35,400 @@
     <body>
 
     <div class="reveal">
-
     <div class="slides">
 
+    <!-- Title -->
     <section
-      data-background="../img/rgba30.png" 
-      data-background-size="1000px">
+            data-background="../img/rgba30.png" 
+            data-background-size="1000px">
 
         <h1>Writing, Running, and Distributing</h1>
         <h2>Modern Python GIS Software</h2>
         <p>Sean Gillies &#8729; Mapbox</p>
         <p><small>GeoRodeo 2015 &#8729; Austin &#8729; May 22</small></p>
 
-    <aside class="notes">
-    Hi! Good morning! Thank you very much for coming to this sessiom. My name
-    is Sean Gillies, I work at Mapbox.  I've been a Python programmer since
-    2001 and a GIS analyst and programmer since 1999, with a séjour in the
-    digital classics from 2006 to 2013.  This is my first GeoRodeo.
-    </aside>
+        <aside class="notes">
+        Hi! Good morning! Thank you very much for coming to this sessiom. My name
+        is Sean Gillies, I work at Mapbox.  I've been a Python programmer since
+        2001 and a GIS analyst and programmer since 1999, with a séjour in the
+        digital classics from 2006 to 2013.  This is my first GeoRodeo.
+        </aside>
+
+    <!-- End Title -->
+    </section>
+
+    <!-- Intro -->
+    <section>
+
+        <section>
+            <h2>A Brief History of Python and GIS</h2>
+            <img src="img/python.png">
+        </section>
+
+        <section>
+            <h2>In the Beginning there was AVPython</h2>
+            <img src="img/avpython.png" width="800">
+
+            <aside class="notes">
+
+            In a reply, Norman Vine pointed out that the UMN MapServer
+            project had Perl bindings.
+
+            In 2000, this would have been Python version 1.5.2.
+
+            I was an ArcView user in 2000, but didn't find out about 
+            AVPython until 2002, after I'd moved on from my job at the
+            GIS shop.
+
+            </aside>
+        </section>
+
+        <section>
+            <h2>Then GDAL</h2>
+            <img src="img/gdal-py.png" width="800">
+
+            <aside class="notes">
+
+            The GDAL project went with SWIG for scripting language
+            bindings, but with Python (like AVPython) instead of Perl.
+            Norman Vine had some influence here.
+
+            </aside>
+        </section>
+
+        <section>
+            <h2>After GDAL</h2>
+            <ul>
+                <li>PyTerra, MapServer (2002)</li>
+                <li>ArcGIS (2004), QGIS (2006?)</li>
+                <li class="fragment">15 years of Python and GIS</li>
+            </ul>
+        </section>
+
+        <!-- Why Python Today? -->
+        <section
+                data-background="img/1200px-LTD_Crown_Victroia_S.jpg">
+            <aside class="notes">
+
+            Why Python? Isn't it yesterday's language? Isn't Python slow and
+            a waste of energy? A gas guzzler? Shouldn't I be thinking more of
+            the polar bears?  It doesn't even run in my browser. Why Python?
+
+            </aside>
+
+        </section>
+
+        <section>
+            <h2>Why Python Today?</h2>
+            <ul>
+                <li class="fragment">Scientific computing: Numpy, SciPy, scikit-learn &c</li>
+                <li class="fragment">A Very Big GIS Product</li>
+                <li class="fragment">It's still fun to use</li>
+            </ul>
+
+            <aside class="notes">
+            Python isn't the cool or cutting edge language where I work. Not by a long
+            shot. We use it at Mapbox because it has more features or more maturity
+            in some important domains. You might be in the same boat as me.
+
+            Python's scientific, engineering, and mathematics software ecosystem is
+            exceptional. The Numpy, Scipy, and Scikit projects are heavy lifters with
+            no mature equivalents in Node.js.
+
+            For us in this room, it's also significant that Python is the primary
+            scripting language for Esri's ArcGIS and also QGIS.
+
+            Python still matters. It's a great general purpose language and is
+            very strong in the rapidly growing data science field. It remains
+            a very useful language for GIS.
+
+            </aside>
+        </section>
+
+        <section>
+            <h2>In this Talk</h2>
+            <ul>
+                <li>How to w<b style="color:yellow">rite</b> good Python programs</li>
+                <li>How to w<b style="color:yellow">rangle</b> and distribute them</li>
+                <li>How to deploy and <b style="color:yellow">run</b> them</li>
+            </ul>
+
+            <aside class="notes">
+            I'm going to talk about "The Three R's" and how to profit from them.
+            How to process more data, faster. 
+            </aside>
+        </section>
+
+        <section>
+            <h2>Not in this Talk</h2>
+            <ul>
+                <li>Web frameworks</li>
+                <li>Graphical user interfaces</li>
+            </ul>
+
+            <aside class="notes">
+            Python has many mature web frameworks and we don't have time to
+            cover them.
+
+            GUI development has never been Python's strong suite and between
+            other Native SDKs (iOS, whatever) and modern browser-based apps,
+            I don't see room for Python to improve here.
+
+            </aside>
+        </section>
+
+    <!-- End Introduction -->
+    </section>
+
+    <!-- Begin Writing Python -->
+
+    <section>
+
+        <section>
+            <h2>Writing Python</h2>
+
+        </section>
+
+        <section>
+            <h2>Test Early, Test Often</h2>
+            <img src="img/passing.svg" height="100" border="0">
+            <img src="img/coveralls_100.svg" height="100" border="0">
+
+            <aside class="notes">
+
+            It's never to early to start testing your code. The longer you
+            wait to start testing, the harder it is to write the tests. Start
+            while it's easy.
+
+            There are a number of ways to test Python code. The good ones 
+            make it easy to get started. I like "pytest".
+
+            </aside>
+        </section>
+
+        <section>
+            <h2>Pytest</h2>
+            <pre><code data-trim>
+"""script.py: print 'Spam and Eggs'."""
+
+
+def get_msg():
+    return "Spam and Egs"
+
+
+# This is a test.
+def test_get_msg():
+    assert get_msg() == "Spam and Eggs"
+
+
+if __name__ == '__main__':
+    print(get_msg())
+</code></pre>
+            <aside class="notes">
+
+            For pytest, you write functions that start with "test" and make
+            assertions. No xUnit boilerplate. Your first tests are as simple
+            as that. As I'm showing here, you can even put the tests inside
+            your script, although we usually keep the tests outside in 
+            another module as they grow.
+
+            </aside>
+        </section>
+
+        <section>
+            <h2>Assertion Introspection</h2>
+            <pre><code data-trim>
+$ py.test script.py
+=================================== FAILURES ===================================
+_________________________________ test_get_msg _________________________________
+
+    def test_get_msg():
+>       assert get_msg() == "Spam and Eggs"
+E       assert 'Spam and Egs' == 'Spam and Eggs'
+E         - Spam and Egs
+E         + Spam and Eggs
+E         ?            +
+
+script.py:10: AssertionError
+=========================== 1 failed in 0.01 seconds ===========================
+</code></pre>
+            <aside class="notes">
+
+            Pytest works by modifying the abstract syntax tree of your
+            module in a process its author calls "assertion introspection."
+            
+            Instead of an AssertionError, you get a comparison of the 
+            values on either side of the assertion and helpful clues.
+            </aside>
+        </section>
+
+        <section>
+            <h2>Coverage</h2>
+            <pre><code data-trim>
+$ py.test script.py --cov script --cov-report=term-missing
+============================= test session starts ==============================
+platform darwin -- Python 2.7.9 -- py-1.4.26 -- pytest-2.6.4
+plugins: cov
+collected 1 items
+
+script.py .
+--------------- coverage: platform darwin, python 2.7.9-final-0 ----------------
+Name     Stmts   Miss  Cover   Missing
+--------------------------------------
+script       6      1    83%   14
+
+=========================== 1 passed in 0.01 seconds ===========================
+</code></pre>
+            <aside class="notes">
+
+            Pytest has a handy code coverage plugin, too.
+            </aside>
+        </section>
+
+
+    <section>
+    <h2>Slow code, fast code</h2>
+    <pre><code class="python" data-trim>
+# C style.
+nums = []
+for i in range(100):
+    nums.append(i)
+    </code></pre>
+
+    vs
+
+    <pre><code class="python" data-trim>
+# Python style.
+nums = [i for in range(100)]
+    </code></pre>
+
+<aside class="notes">
+
+Don't write slow code. Write fast code.
+
+First, I'm showing the most imperative, C-like way of making a Python list of the first 100 numbers.
+Next, the most idiomaticly Python way of doing it.
+</aside>
 
     </section>
 
     <section>
-    <!-- Introduction -->
+    <h2>Not just less code – faster</h2>
+    <pre><code class="bash" data-trim>
+$ python -m timeit -s "ns=[]" "for i in xrange(1000): ns.append(i)"
+10000 loops, best of 3: 76.4 usec per loop
+</code></pre>
+
+vs
+
+<pre><code class="bash" data-trim>
+$ python -m timeit -s "ns=[i for i in xrange(1000)]"
+100000000 loops, best of 3: 0.0108 usec per loop
+</code></pre>
+
+<aside class="notes">
+The idomaticly Python way is faster. ridiculously faster!
+
+Do this in your code.
+
+Provide APIs like this in your Python packages.
+</aside>
+    </section>
+
+
+        <section>
+            <h2>Even faster: Numpy ufuncs</h2>
+
+            <pre><code class="bash" data-trim>
+# Initialized with -s "a = list(range(100000))"
+$ python -m timeit "[val + 5 for val in a]"
+100 loops, best of 3: 4.99 msec per loop
+
+# Initialiazed with 
+# -s "import numpy; a = list(range(100000)); a = numpy.array(a)" 
+$ python -m timeit "a+5"
+10000 loops, best of 3: 69.9 usec per loop
+            </code></pre>
+
+            <aside class="notes">
+                I got this benchmark comparison from Jake VanderPlas.
+
+                That's 70x faster!
+            </aside>
+
+        </section>
+
+    <!-- End writing Python -->
+    </section>
+
+    <!-- Running Python -->
+    <section>
+
+        <section>
+            <h2>Running Python</h2>
+            <ul>
+                <li class="fragment">Parallelism</li>
+                <li class="fragment">Dependency Management</li>
+            </ul>
+
+        </section>
+
+        <section>
+            <h2>Multiprocessing</h2>
+            <pre><code class="python" data-trim>
+from multiprocessing import Pool
+
+def f(x):
+    return x*x
+
+if __name__ == '__main__':
+    with Pool(5) as p:
+        print(p.map(f, [1, 2, 3]))
+            </code></pre>
+
+            <aside class="notes">
+
+            I rely on Python's multiprocessing module to parallelize data
+            processing work and use all my computer's CPUs.
+
+            Why not threading? Because Python's global interpreter lock
+            ensures that only one thread in a process is running at a time.
+            This means that threading is only useful for asynchronous I/O
+            in Python.
+
+            Multiprocessing can be very effective in processing raster data.
+            I'm going to use as an example, the problem of turning a raster
+            dataset in some projection into a set of web mercator (a different
+            projection) tiles of many zoom levels.
+
+        </section>
+
+        <section>
+            <h2>Managing dependencies</h2>
+
+        </section>
+
+    <!-- End running Python -->
+    </section>
+
 
     <section>
-    <h2>The Three R's</h2>
-    <ul>
-        <li>How to w<b style="color:yellow">rite</b> good Python programs</li>
-        <li>How to w<b style="color:yellow">rangle</b> and distribute them</li>
-        <li>How to deploy and <b style="color:yellow">run</b> them</li>
-    </ul>
+    <h2>Distributing Python</h2>
 
-    <aside class="notes">
-
-    This is what I'm going to talk about.
-
-    </aside>
+    <!-- End distributing Python -->
     </section>
 
     <section>
-    <!-- Motivation -->
-    <h2>Why Python?</h2>
-    <ul>
-        <li class="fragment">Killer open source modules: Numpy, SciPy, scikit-learn &c</li>
-        <li class="fragment">It's the favored scripting language for Enterprise GIS Product</li>
-    </ul>
+    <h2>Writing Python</h2>
 
-    <aside class="notes">
-
-    Why Python? Isn't it yesterday's language? Isn't Python slow and a waste
-    of energy? Shouldn't I be thinking more of the polar bears? It doesn't
-    even run in my browser. Why Python?
-
-    Python isn't the cool or cutting edge language where I work. Not by a long
-    shot. We use it at Mapbox because it has more features or more maturity
-    in some important domains. I expect it's the same case for you.
-
-    Python's scientific, engineering, and mathematics software ecosystem is
-    exceptional. The Numpy, Scipy, and Scikit projects are heavy lifters with
-    no mature equivalents in Node.js.
-
-    For this audience, it's also significant that Python is the primary
-    scripting language for Esri's ArcGIS and also QGIS.
-
-    </aside>
-    </section>
-
-    <!-- Introduction -->
+    <!-- End writing Python -->
     </section>
 
     <section>
     <!-- Conclusion -->
 
     <section>
-    <h2>That's how to use Python</h2>
+    <h2>Conclusion</h2>
     </section>
 
     <section>
@@ -143,20 +462,23 @@
 
     </section>
 
+    <!-- End conclusion -->
     <section>
+
+    <section>
+    <h2>The End</h2>
 
     <h2>Thanks</h2>
     <ul>
-      <li>Mapbox satellite team (Chris, Charlie, Amit, Bruno, Camilla)</li>
-      <li>Asger Petersen, Mike Toews, Brendan Ward, Kelsey Jordahl, René Buffat, Jacob Wasserman, Oliver Tonnhofer, Joshua Arnott, Phil Elson, Matt Perry</li>
-      <li>And especially Frank Warmerdam and Even Rouault</li>
     </ul>
     </section>
 
     <section>
     <h2>Links</h2>
+
+https://speakerdeck.com/jakevdp/losing-your-loops-fast-numerical-computing-with-numpy-pycon-2015
+
     <ul>
-      <li><a href="https://github.com/sgillies/foss4g-2014-fiona-rasterio">https://github.com/sgillies/foss4g-2014-fiona-rasterio</a></li>
       <li><a href="https://github.com/Toblerity/Fiona">https://github.com/Toblerity/Fiona</a></li>
       <li><a href="https://github.com/mapbox/rasterio">https://github.com/mapbox/rasterio</a></li>
       <li><a href="https://github.com/Toblerity/Shapely">https://github.com/Toblerity/Shapely</a></li>
@@ -165,6 +487,9 @@
 
     <section>
         <h2>THE END</h2>
+    </section>
+
+    <!-- The end -->
     </section>
 
     <!-- end slides -->
