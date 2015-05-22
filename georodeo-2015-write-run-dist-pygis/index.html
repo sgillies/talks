@@ -155,7 +155,10 @@
 
             <aside class="notes">
             I'm going to talk about "The Three R's" and how to profit from them.
-            How to process more data, faster. 
+            How to process more data, faster.
+
+            You'll see the unix bash shell in my examples, but everything I'm going
+            to talk about translates fairly well to Windows and PowerShell.
             </aside>
         </section>
 
@@ -186,6 +189,10 @@
 
         <section>
             <h2>Writing Python</h2>
+            <ul class="fragment">
+                <li>Making it good</li>
+                <li>Making it fast</li>
+            </ul>
 
         </section>
 
@@ -366,9 +373,9 @@ $ python -m timeit "a+5"
 
         <section>
             <h2>Running Python</h2>
-            <ul>
-                <li class="fragment">Parallelism</li>
-                <li class="fragment">Dependency Management</li>
+            <ul class="fragment">
+                <li>Parallelism</li>
+                <li>Dependency Management</li>
             </ul>
 
         </section>
@@ -386,6 +393,8 @@ if __name__ == '__main__':
         print(p.map(f, [1, 2, 3]))
             </code></pre>
 
+            <p>See <a href="https://github.com/mapbox/rio-mbtiles">https://github.com/mapbox/rio-mbtiles</a> for a raster tiling example.</p>
+
             <aside class="notes">
 
             I rely on Python's multiprocessing module to parallelize data
@@ -401,11 +410,116 @@ if __name__ == '__main__':
             dataset in some projection into a set of web mercator (a different
             projection) tiles of many zoom levels.
 
+            The example above comes from the Python docs. For my problem,
+            what I pass to the pool's map() is descriptors of all my 
+            mercator tiles and a function that, given, a tile descriptor,
+            makes an destination raster - warps the source dataset into it -
+            and returns that raster tile as a sequence of bytes.
         </section>
 
         <section>
-            <h2>Managing dependencies</h2>
+            <h2>Requirement Hell</h2>
+            <ul>
+                <li class="fragment">Program A.py requires version 1.2.3 (exactly) of module X</li>
+                <li class="fragment">Program B.py requires version 2.0.0 (or newer) of module X</li>                <li class="fragment">How can you get both scripts working at the same time?</li>
+            </ul>
 
+            <aside class="notes">
+                Things are fairly simple if you're only using modules from 
+                Python's standard library in your programs. But when you begin
+                to use non-standard GIS modules, Numpy, SciPy, as we do, 
+                managing dependencies becomes a little more difficult.
+
+                How do we stay out of requirement hell as we deploy and run
+                our programs?
+
+                One solution is virtual environments.
+            </aside>
+
+        </section>
+
+        <section>
+            <h2>Virtualenv</h2>
+
+            <ul>
+                <li class="fragment">Every site/service/app has its own "venv" directory.</li>
+                <li class="fragment">And its own "requirements.txt" file.</li>
+            </ul>
+
+            <aside class="notes">
+
+            Virtualenv is a Python command. It creates "virtual environments":
+            a Python executable and its own private non-standard modules,
+            or what we call "site packages". I like to use virtualenv in a 
+            way that reminds my colleagues of Node.js's node_modules directory.
+            Because they are largely Node users.
+
+            </aside>
+
+        </section>
+
+        <section>
+            <h2>Virtualenv...</h2>
+            
+            <pre><code>
+$ virtualenv venv
+$ source venv/bin/activate
+(venv)$ pip install -r requirements.txt
+            </code></pre>
+
+            <aside class="notes">
+
+            This is more or less the equivalent of what "npm install" does
+            for a Node.js project. Python doesn't have conventions like
+            Node does (package.json and node_modules) and so you need to be
+            more explicit.
+
+            </aside>
+
+        </section>
+
+        <section>
+            <img src="img/large_v-dark.png" width="600">
+
+            <aside class="notes">
+
+            Docker is a different approach to managing requirements. I'm 
+            using it in several Python projects right now.
+
+            You might use a Docker container instead of a virtualenv.
+
+            </aside>
+
+        </section>
+
+        <section>
+            <h2>Docker Example</h2>
+            <pre><code class="bash">
+$ docker run -itd --name tfrs \
+> -v "/Users/sean/code/rasterio/tests/data:/mnt/data:ro" \
+> mapbox/travis-frs:pre0 /bin/bash
+87d7321ad492574f82c7957670c15e0067d4fcd5b3dd803bc3cef6fadd2e0aeb
+
+$ docker exec tfrs rio shapes --mask /mnt/data/RGB.byte.tif \
+> | geojsonio
+            </code></pre>
+
+            <aside class="notes">
+
+            Docker is a different approach to managing requirements. I'm 
+            using it in several Python projects right now.
+
+            You might use a Docker container instead of a virtualenv.
+
+            It's only a 15% slower than the native code on my MacBook. 
+            Running on a better (Linux) host, the performance should be 
+            excellent.
+            </aside>
+
+        </section>
+
+        <section>
+            <img src="img/Untitled.png" height="600">
         </section>
 
     <!-- End running Python -->
@@ -413,16 +527,77 @@ if __name__ == '__main__':
 
 
     <section>
-    <h2>Distributing Python</h2>
+    
+        <section>
+        <h2>Distributing Python</h2>
+        <ul class="fragment">
+            <li>Publishing wheels</li>
+            <li>Pluggability</li>
+        </ul>
+        </section>
 
+        <section>
+            <img src="img/Mars_rovers_wheels_isometric.jpg">
+            <a href="http://pythonwheels.com/">http://pythonwheels.com/</a>
+        </section>
+
+        <section>
+            <h2>Advantages of wheels</h2>
+            <ul>
+                <li>Faster installation for pure python and native C extension packages.</li>
+                <li>Avoids arbitrary code execution for installation.</li>
+                <li>Installation of a C extension does not require a compiler on Windows or OS X.</li>
+            </ul>
+
+            <aside class="notes">
+
+            </aside>
+
+        </section>
+
+        <section>
+            <h2>Plugins</h2>
+
+            <pre><code class="python">
+entry_points={'pytest11': ['pytest_cov = pytest_cov']},
+            </code></pre>
+
+            <aside class="notes">
+            
+            If you're building a pluggable Python program, such as pytest, 
+            which I mentioned earlier, consider using Python's own plugin
+            system instead of rolling your own.
+
+            The code above is from the setup script of pytest's own coverage
+            plugin.
+
+            Pytest queries its Python for registered entry points to discover
+            such plugins at run time.
+
+            </aside>
+
+        </section>
+
+        <section>
+            <h2>Rasterio Plugins</h2>
+            <img src="img/poopy_plugin.png">
+
+            <aside class="notes">
+            
+            We're using this same plugin system to make Rasterio's command
+            line interface better organized and pluggable in a way that
+            GDAL's utility suite (gdal_translate and friends) is not.
+
+            If you look closely, you can see that we've added a little bit
+            of emoji assistance to let you know if a third party plugin is
+            broken.
+
+            </aside>
+
+        </section>
     <!-- End distributing Python -->
     </section>
 
-    <section>
-    <h2>Writing Python</h2>
-
-    <!-- End writing Python -->
-    </section>
 
     <section>
     <!-- Conclusion -->
@@ -434,16 +609,10 @@ if __name__ == '__main__':
     <section>
     <h2>Writing Python</h2>
     <ul>
-    </ul>
-
-    <aside class="notes">
-    </aside>
-    </section>
-
-    <section>
-    <!-- What I've told you -->
-    <h2>Distributing Python</h2>
-    <ul>
+        <li>Test early and often</li>
+        <li>Try pytest</li>
+        <li>Use fast Python expressions</li>
+        <li>Use Numpy for more speed</li>
     </ul>
 
     <aside class="notes">
@@ -454,39 +623,51 @@ if __name__ == '__main__':
     <!-- What I've told you -->
     <h2>Running Python</h2>
     <ul>
+        <li>Try multiprocessing.Pool</li>
+        <li>A virtualenv for every project</li>
+        <li>Consider Docker</li>
     </ul>
 
     <aside class="notes">
     </aside>
     </section>
 
-    </section>
-
-    <!-- End conclusion -->
-    <section>
 
     <section>
-    <h2>The End</h2>
-
-    <h2>Thanks</h2>
+    <!-- What I've told you -->
+    <h2>Distributing Python</h2>
     <ul>
+        <li>Build wheels to share modules</li>
+        <li>Use pip to install modules</li>
+        <li>For plugins: setuptools entry points</li>
     </ul>
+
+    <aside class="notes">
+
+    And once you've incorporated these tips, you're on your way to discovering
+    that old gas guzzler is actually this...
+    </aside>
     </section>
 
+    <section data-background="img/1200px-Tesla_Model_S_Indoors.jpg">
+    </section>
+
+    </section>
+    <!-- End conclusion -->
+
     <section>
-    <h2>Links</h2>
 
-https://speakerdeck.com/jakevdp/losing-your-loops-fast-numerical-computing-with-numpy-pycon-2015
-
+    <h2>Project Links</h2>
     <ul>
       <li><a href="https://github.com/Toblerity/Fiona">https://github.com/Toblerity/Fiona</a></li>
       <li><a href="https://github.com/mapbox/rasterio">https://github.com/mapbox/rasterio</a></li>
       <li><a href="https://github.com/Toblerity/Shapely">https://github.com/Toblerity/Shapely</a></li>
+      <li><a href="https://github.com/mapbox/rio-mbtiles">https://github.com/mapbox/rio-mbtiles</a></li>
     </ul>
     </section>
 
     <section>
-        <h2>THE END</h2>
+        <h2>Thanks!</h2>
     </section>
 
     <!-- The end -->
