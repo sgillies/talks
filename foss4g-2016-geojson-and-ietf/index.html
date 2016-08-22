@@ -1,0 +1,330 @@
+<!doctype html>
+<html lang="en">
+
+    <head>
+        <meta charset="utf-8">
+
+        <title>The IETF and GeoJSON</title>
+
+        <meta name="apple-mobile-web-app-capable" content="yes" />
+        <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+        <link rel="stylesheet" href="../css/reveal.css">
+        <link rel="stylesheet" href="../css/theme/black.css" id="theme">
+
+        <!-- For syntax highlighting -->
+        <link rel="stylesheet" href="../lib/css/zenburn.css">
+
+        <!-- If the query includes 'print-pdf', include the PDF print sheet -->
+        <script>
+            if( window.location.search.match( /print-pdf/gi ) ) {
+                var link = document.createElement( 'link' );
+                link.rel = 'stylesheet';
+                link.type = 'text/css';
+                link.href = 'css/print/pdf.css';
+                document.getElementsByTagName( 'head' )[0].appendChild( link );
+            }
+        </script>
+
+        <!--[if lt IE 9]>
+        <script src="lib/js/html5shiv.js"></script>
+        <![endif]-->
+    </head>
+
+    <body>
+
+    <div class="reveal">
+    <div class="slides">
+
+    <!-- Title -->
+    <section
+            data-background="img/rgba30.png" 
+            data-background-size="1000px">
+
+        <h1>The IETF and GeoJSON</h1>
+
+        <div style="font-size: larger">
+            <p>Sean Gillies</p>
+            <p>@sgillies</p>
+            <p>Mapbox</p>
+        </div>
+
+        <aside class="notes">
+        </aside>
+
+    <!-- End Title -->
+    </section>
+
+    <!-- Intro -->
+    <section>
+
+        <section>
+            <h2>How to read RFC&nbsp;7946</h2>
+
+            <aside class="notes">
+            </aside>
+
+        </section>
+
+        <section>
+            <h2>How to understand the IETF</h2>
+
+            <aside class="notes">
+            </aside>
+
+        </section>
+
+        <section>
+            <h2>How to handle changes</h2>
+
+            <aside class="notes">
+            </aside>
+
+        </section>
+
+        <section>
+            <h2>Anatomy of an RFC</h2>
+
+            <aside class="notes">
+            </aside>
+
+        </section>
+
+        <section>
+            <h2>What the IETF is</h2>
+
+            <aside class="notes">
+            </aside>
+
+        </section>
+
+    <!-- End intro -->
+    </section>
+
+    <!-- Changes -->
+    <section>
+
+
+        <section>
+            <h1>Clarifications, Changes, & Recommendations</h1>
+
+            <aside class="notes">
+            </aside>
+
+        </section>
+
+        <section>
+            <h2>Coordinate Precision</h2>
+            <p>#Recommendation</p>
+            <p>6 or 7 decimal places is enough for long, lat</p>
+
+            <aside class="notes">
+            This is something we all know we should do, but often do little
+            about. It's now a recommendation in the RFC. Think of the polar
+            bears before you write longitude and latitude to 15 decimal places.
+            </aside>
+
+        </section>
+
+        <section>
+            <h2>Geometry Collections</h2>
+            <p>#Recommendation</p>
+            <p>Implementers SHOULD avoid, if possible</p>
+            <p class="fragment">Have no special semantics</p>
+
+            <aside class="notes">
+               GeometryCollections have a different syntax from single type Geometry
+   objects but have no different semantics.  Although a
+   GeometryCollection object has no "coordinates" member, it does have
+   coordinates: the coordinates of all its parts belong to the
+   collection.  The "geometries" member of a GeometryCollection
+   describes the parts of this composition.  Implementations SHOULD NOT
+   apply any additional semantics to the "geometries" array.
+            </aside>
+
+        </section>
+
+        <section>
+            <h2>Interpreting elevation</h2>
+            <p>#Clarification</p>
+            <p>Defined elevation is relative to reference ellipsoid</p>
+            <p class="fragment">Undefined elevation SHOULD == local ground/sea level</p>
+            <aside class="notes">
+            The original spec was not clear about this.
+            </aside>
+
+        </section>
+
+        <section>
+            <h2>Interpolating Positions</h2>
+            <p>#Clarification</p>
+            <p>Lines between positions are cartesian</p>
+            <p class="fragment">Not great circles</p>
+
+            <aside class="notes">
+            The original spec was not clear about this. WG consensus is
+            that great circles would be a change and not a necessary one:
+            representation of great circles in GeoJSON by approximation
+            is not a blocker for applications.
+            </aside>
+
+        </section>
+
+        <section>
+            <h2>Extending Positions</h2>
+            <p>#Change</p>
+            <p>Implementations SHOULD NOT extend position arrays beyond 3
+            elements</p>
+
+            <aside class="notes">
+            Previously, the spec said that the meaning of extra elements was
+            undefined. WG consensus is that extra elements are bad for
+            interoperability. How does a consumer know what a 4th or 5th
+            element means? It's better to put such extension data in JSON
+            objects.  </aside>
+
+        </section>
+
+        <section>
+            <h2>Bounding boxes</h2>
+            <p>#Change</p>
+            <p>[west, south, east, north]</p>
+
+            <aside class="notes">
+            Away from the antimerdian and poles, this is the same as before.
+            What's new is that boxes that cross the antimeridian and touch the
+            poles can now be unambiguously specified.  </aside>
+
+        </section>
+
+        <section>
+            <h2>Ring orientation</h2>
+            <p>#Change</p>
+            <p>Counterclockwise == positive area</p>
+            <p>Clockwise == negative area (hole)</p>
+            <p class="fragment">Math and Physics right-hand rule</p>
+
+            <aside class="notes">
+            This is more to help with interpretation of rings than
+            distinguishing positive and negative areas, which are already
+            covered by the requirement that interior rings follow the exterior
+            ring.  </aside>
+
+        </section>
+
+        <section>
+            <h2>Coordinate Order</h2>
+            <p class="fragment">#LOL</p>
+
+            <aside class="notes">
+            I want to remind the audience that GeoJSON was written by people
+            who used GDAL to access EPSG:4326 Shapefiles in the early 2000s,
+            and this is largely why GeoJSON has longitude, latitude order.
+            
+            and this is 
+            This is something we all know we should do, but often do little
+            about. It's now a recommendation in the RFC. Think of the polar
+            bears before you write longitude and latitude to 15 decimal places.
+            </aside>
+
+        </section>
+
+        <section>
+            <h2>For most of history</h2>
+            <p class="fragment">Latitude == (⌒‿⌒)</p>
+            <p class="fragment">Longitude == ¯\_(ツ)_/¯</p>
+
+            <aside class="notes">
+            Latitude comes first in records. Part of the reason why may be
+            that, while observing latitude was a fairly easy thing,
+            observing longitude was a big problem until the 18th
+            century.
+            </aside>
+
+        </section>
+
+        <section>
+            <h2>CRS</h2>
+            <p>Saving the best for last!</p>
+
+            <aside class="notes">
+            I'm saving the best for last!
+
+            Coordinate reference systems are no longer in the core of the specification; use CRS84 longitude and latitude with GeoJSON from now on.
+            </aside>
+
+        </section>
+
+
+
+    <!-- End changes -->
+    </section>
+
+    <!-- Finish -->
+    <section>
+
+        <section>
+            <h2>What I Told You</h2>
+
+            <!-- Reference RFC 7946 from now on instead of http://geojson.org.-->
+            <aside class="notes">
+            </aside>
+
+        </section>
+
+    </section>
+
+    <!-- Thanks -->
+
+    <section>
+        <h2>Thank You!</h2>
+
+        <aside class="notes">
+        </aside>
+
+    </section>
+
+    <!-- end slides -->
+    </div>
+
+    <!-- end reveal container -->
+    </div>
+
+    <!-- Scripts below -->
+
+        <script src="../lib/js/head.min.js"></script>
+        <script src="../js/reveal.js"></script>
+
+        <script>
+
+            // Full list of configuration options available here:
+            // https://github.com/hakimel/reveal.js#configuration
+            Reveal.initialize({
+                controls: true,
+                progress: true,
+                history: true,
+                center: true,
+
+                theme: Reveal.getQueryHash().theme || 'night', // available themes are in /css/theme
+                transition: Reveal.getQueryHash().transition || 'default', // default/cube/page/concave/zoom/linear/fade/none
+
+                // Parallax scrolling
+                // parallaxBackgroundImage: 'https://s3.amazonaws.com/hakim-static/reveal-js/reveal-parallax-1.jpg',
+                // parallaxBackgroundSize: '2100px 900px',
+
+                // Optional libraries used to extend on reveal.js
+                dependencies: [
+                    { src: '../lib/js/classList.js', condition: function() { return !document.body.classList; } },
+                    { src: '../plugin/markdown/marked.js', condition: function() { return !!document.querySelector( '[data-markdown]' ); } },
+                    { src: '../plugin/markdown/markdown.js', condition: function() { return !!document.querySelector( '[data-markdown]' ); } },
+                    { src: '../plugin/highlight/highlight.js', async: true, callback: function() { hljs.initHighlightingOnLoad(); } },
+                    { src: '../plugin/zoom-js/zoom.js', async: true, condition: function() { return !!document.body.classList; } },
+                    { src: '../plugin/notes/notes.js', async: true, condition: function() { return !!document.body.classList; } }
+                ]
+            });
+
+        </script>
+
+    </body>
+</html>
