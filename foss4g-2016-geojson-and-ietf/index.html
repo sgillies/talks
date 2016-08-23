@@ -56,19 +56,85 @@
     <!-- End Title -->
     </section>
 
-    <!-- Intro -->
+    <!-- Intro, significance -->
     <section>
 
         <section>
-            <h2>How to read RFC&nbsp;7946</h2>
+            <h1>RFC 7946: the GeoJSON format</h1>
 
             <aside class="notes">
+            RFC 7946 was published in August 2016 after 8 months as an
+            adopted draft (draft-ietf-geojson) and 17 months as an independent
+            draft (draft-butler-geojson).
+
+            An "RFC" is what the IETF calls a "Request for Comments" and 
+            contain technical and organizational notes about the internet.
+            This one is number 7946.
+
+            RFC 1: Host Software was written by Steve Crocker at UCLA on April
+            7, 1969. Interestingly, a problem described in RFC 1 is that of
+            preserving console responsiveness between network hosts (you
+            accessing utilities of host B while typing on a terminal of host A)
+            and it proposes that host B would deliver a front end program for
+            the utility to host A, so that, for example, information could be
+            input and parsed as though the program were running on A. You can
+            see the origins of Code on demand, Java applets, ActionScript,
+            JavaScript in RFC 1.
+
+            7944: Diameter Routing Message Priority is the RFC preceding.
+            Diameter is an authentication, authorization, and accounting
+            protocol for computer networks and plays a role in mobile roaming.
+
+            7949: OSPFv3 over IPv4 for IPv6 Transition.
+            </aside>
+
+            <p class="fragment">The spec at geojson.org is obsolete</p>
+            
+            <aside class="notes">
+            RFC 7946 replaces the specification published in 2008 at geojson.org.
+            It is the definition of the GeoJSON format for the internet.
+            
+            I'm here to persuade you to adopt and reference 7946 in your
+            projects.
+        </section>
+
+        <section>
+            <h1>RFC 7946 is better</h1>
+            <ul>
+            <li class="fragment">Bug fixes</li>
+            <li class="fragment">Constraints</li>
+            <li class="fragment">Clear IPR</li>
+            <li class="fragment">Clearer direction</li>
+            <li class="fragment">It's an internet standard</li>
+            </ul>
+
+            <aside class="notes">
+            The spec is technically better. We fixed actual errors in text
+            and examples. We clarified ambiguities.
+
+            We've added constraints. Constraints are a good thing for
+            interoperability.
+
+            Clear IPR. See https://tools.ietf.org/html/rfc3979.
+
+            Clear direction for the future. GeoJSON now belongs to the
+            internet and there is a process for documenting
+            errata and even obsoleting it that the ad hoc GeoJSON working
+            group did not provide before.
+
+            The IETF's GeoJSON WG remains open for discussions about the
+            format and implementation.
             </aside>
 
         </section>
 
+    </section>
+
+    <!-- The IETF -->
+    <section>
+
         <section>
-            <h2>How to understand the IETF</h2>
+            <h1>the IETF: a primer</h1>
 
             <aside class="notes">
             </aside>
@@ -206,57 +272,134 @@
             <p class="fragment">Math and Physics right-hand rule</p>
 
             <aside class="notes">
-            This is more to help with interpretation of rings than
-            distinguishing positive and negative areas, which are already
-            covered by the requirement that interior rings follow the exterior
-            ring.  </aside>
+            This is more to help with interoperability with other standards and
+            systems than to distinguish positive and negative areas within
+            GeoJSON. This distinction is already covered by the requirement
+            that interior rings follow the exterior ring.  </aside>
 
         </section>
 
         <section>
-            <h2>Coordinate Order</h2>
-            <p class="fragment">#LOL</p>
+            <h2>Extending GeoJSON</h2>
+
+            <blockquote>
+            JSON is flexible. New fields can be added to existing structures
+            without obsoleting existing programs.
+            <footer>— Douglas Crockford</footer>
+            </blockquote>
+
+        </section>
+
+        <section>
+            <h2>Foreign members</h2>
+            <p>#Clarification</p>
+            <p>Parsers MAY ignore them</p>
+            <p class="fragment">Members of foreign members are also foreign</p>
 
             <aside class="notes">
-            I want to remind the audience that GeoJSON was written by people
-            who used GDAL to access EPSG:4326 Shapefiles in the early 2000s,
-            and this is largely why GeoJSON has longitude, latitude order.
-            
-            and this is 
-            This is something we all know we should do, but often do little
-            about. It's now a recommendation in the RFC. Think of the polar
-            bears before you write longitude and latitude to 15 decimal places.
-            </aside>
+            Any object or member not defined in RFC 7946 is a foreign
+            object, meaning that their semantics are undefined in GeoJSON
+            and must be specified elsewhere. If you request data in
+            "application/geo+json" format and receive GeoJSON with
+            foreign members, you MAY ignore them.
+
+            The spec know acknowledges that extension of
+            GeoJSON is possible and that people do it, but doesn't
+            specify how extensions are discovered or used.</aside>
 
         </section>
 
         <section>
-            <h2>For most of history</h2>
-            <p class="fragment">Latitude == (⌒‿⌒)</p>
-            <p class="fragment">Longitude == ¯\_(ツ)_/¯</p>
+            <h2>Example</h2>
+
+            <pre><code class="json">
+{ "type": "Feature",
+  "centerline": {
+    "type": "LineString",
+    "coordinates": [[-10, 10], [10, 10]] } }
+            </code></pre>
+
+            <p>RFC 7946 defines no meaning of "centerline"</p>
+            <p class="fragment">"type: LineString" also has no meaning</p>
 
             <aside class="notes">
-            Latitude comes first in records. Part of the reason why may be
-            that, while observing latitude was a fairly easy thing,
-            observing longitude was a big problem until the 18th
-            century.
-            </aside>
+            "centerline" is a foreign member of the Feature object. Even 
+            though its value looks like a Geometry object, it is not a 
+            geometry of the Feature. GeoJSON parsers may ignore the 
+            centerline object. It's up to GeoJSON extensions to define
+            what the meaning of this "centerline" is.</aside>
 
         </section>
 
         <section>
-            <h2>CRS</h2>
-            <p>Saving the best for last!</p>
+            <h2>Be Generous</h2>
+            <p>Help make extensions possible</p>
+            <p>GDAL 2.1 preserves foreign members between GeoJSON files</p>
+
+            <aside class="notes">
+            Foreign members MAY be ignored but that doesn't mean that you
+            SHOULD discard them automatically. GeoJSON tools that are JSON
+            tools at heart can be generous and keep foreign members that
+            might include extensions. In GDAL 2.1, ogr2ogr will preserve
+            foreign members when both the input and output are GeoJSON.</aside>
+
+        </section>
+
+        <section>
+            <h2>Coordinate Reference Systems</h2>
+            <p>#Change</p>
+            <p>No more "crs" object</p>
+            <p>"urn:ogc:def:crs:OGC::CRS84" is it</p>
 
             <aside class="notes">
             I'm saving the best for last!
 
-            Coordinate reference systems are no longer in the core of the specification; use CRS84 longitude and latitude with GeoJSON from now on.
-            </aside>
+            Coordinate reference systems are no longer in the core of the
+            specification; use CRS84 longitude and latitude with GeoJSON from
+            now on.  </aside>
 
         </section>
 
+        <section>
+            <h1>Why?</h1>
+            <p class="fragment">geojson.org named CRS was poorly done</p>
+            <p class="fragment">Linked CRS is potentially harmful</p>
+            <p class="fragment">Agreeing on a single, if imperfect CRS, keeps simple
+            applications uncomplicated</p>
 
+            <aside class="notes">
+            In hindsight, the obviously right way to specify a CRS by its
+            identifier or name is to use a single JSON item, {crs: name}.
+
+            Linked CRS: do you understand how this was supposed to work?
+            You could specify a URL for a resource describing (not identifying)
+            the CRS to be applied to a GeoJSON object.
+            
+            Say you have a service that accepts GeoJSON uploads and someone
+            uploads GeoJSON with a linked CRS. Your parser would make an
+            HTTP request for the resource – and because the geojson.org spec
+            didn't define these resources this doesn't work in practice,
+            but ignore this for now – which is a bit of a drag, network 
+            requests being much more slow than parsing GeoJSON in memory.
+            But it's only one request, right?
+
+            Well, the geojson.org spec says you can have a "crs" on any
+            object. Say someone uploads a 1000 feature collection with a 
+            linked crs on each feature. That's 1000 requests to make. 
+
+            A GeoJSON file like this is trivial to create and expensive to
+            process. Do you recognize the problem here? Implementing linked
+            CRS makes your system vulnerable to attack.
+
+            Finally, agreeing on a single CRS keeps simple applications
+            simple.
+
+            If you want to use projected GeoJSON, producers and consumers
+            need to have an agreement and understanding, and anything you
+            can come up with is probably better than named or linked CRS.
+            </aside>
+
+        </section>
 
     <!-- End changes -->
     </section>
@@ -265,7 +408,7 @@
     <section>
 
         <section>
-            <h2>What I Told You</h2>
+            <h1>Call to action (retitle)</h1>
 
             <!-- Reference RFC 7946 from now on instead of http://geojson.org.-->
             <aside class="notes">
@@ -278,7 +421,7 @@
     <!-- Thanks -->
 
     <section>
-        <h2>Thank You!</h2>
+        <h1>Thank You!</h1>
 
         <aside class="notes">
         </aside>
